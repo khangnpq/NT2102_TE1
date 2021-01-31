@@ -1,0 +1,8 @@
+[migrate]
+flask db migrate -m "something"
+flask db upgrade
+
+[database]
+users = User.query.all()
+for u in users:
+    db.session.delete(u)
