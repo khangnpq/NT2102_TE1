@@ -1,61 +1,48 @@
 from app import app
-from flask import render_template, flash, redirect, request
-from app.forms import LoginForm
-from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User
-from werkzeug.urls import url_parse
+from flask import render_template, flash, redirect, request, url_for
+from app.forms import SearchForm, RegistrationForm, CheckPrizeForm
+from app.models import Participant
 from app import db
-from app.forms import RegistrationForm
 
 @app.route('/')
 @app.route('/index')
-@login_required
 def index():
-    user = {'username': 'Miguel'}
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template('index.html', title='Home', posts=posts)
+    return render_template('index.html', title='Home')
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = LoginForm()
+@app.route('/check_prize', methods=['GET', 'POST'])
+def check_prize():
+    form = CheckPrizeForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
-            return redirect(url_for('login'))
-        login_user(user, remember=form.remember_me.data)
-        next_page = request.args.get('next')
-        if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('index')
-        return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form)
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
+        participant = Participant.query.filter_by(phone=form.phone.data).first()
+        if participant is None or not participant.check_lottery_code(form.lottery_code.data):
+            flash('Invalid phone number or lottery code')
+            return redirect(url_for('check_prize'))
+        else:
+            return render_template('index.html', prize='Good luck next time!')
+    return render_template('check_prize.html', title='Check prizes', form=form)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
+        participant = Participant(first_name=form.first_name.data, 
+                                  last_name=form.last_name.data,
+                                  phone=form.phone.data)
+        code = participant.set_lottery_code(form.phone.data)
+        db.session.add(participant)
         db.session.commit()
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('login'))
+        flash('Registration complete, your lottery code is \n {}'.format(code))
+        return redirect(url_for('index'))
     return render_template('register.html', title='Register', form=form)
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    form = SearchForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        participant = Participant.query.filter_by(phone=form.phone.data).first()
+        if participant is not None: #or not user.check_password(form.password.data):
+            return render_template('index.html', results=participant)  # or what you want
+        else:
+            flash('Phone number is not recognized!')
+            return redirect(url_for('search'))
+    return render_template('search.html', form=form)

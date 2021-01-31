@@ -1,28 +1,30 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
-from app.models import User
+from wtforms import StringField, SubmitField
+from wtforms.validators import ValidationError, DataRequired
+from app.models import Participant
+import phonenumbers
 
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember Me')
-    submit = SubmitField('Sign In')
+class CheckPrizeForm(FlaskForm):
+    phone = StringField('Phone number', validators=[DataRequired()])
+    lottery_code =  StringField('Lottery code', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+class SearchForm(FlaskForm):
+    phone = StringField('Phone number', validators=[DataRequired()])
+    search = SubmitField('Search',
+                       render_kw={'class': 'btn btn-success btn-block'})
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField(
-        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    first_name = StringField('First name', validators=[DataRequired()])
+    last_name = StringField('Last name', validators=[DataRequired()])
+    phone = StringField('Phone number')
     submit = SubmitField('Register')
-
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user is not None:
-            raise ValidationError('Please use a different username.')
-
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
-        if user is not None:
-            raise ValidationError('Please use a different email address.')
+    
+    def validate_phone(self, phone):
+        participant = Participant.query.filter_by(phone=phone.data).first()
+        try:
+            p = phonenumbers.parse(phone.data)
+            if not phonenumbers.is_valid_number(p):
+                raise ValueError()
+        except (phonenumbers.phonenumberutil.NumberParseException, ValueError):
+            raise ValidationError('Invalid phone number')

@@ -1,5 +1,6 @@
 alembic==1.5.3
 appdirs==1.4.3
+Bootstrap-Flask==1.5.1
 CacheControl==0.12.6
 certifi==2019.11.28
 chardet==3.0.4
@@ -27,6 +28,7 @@ MarkupSafe==1.1.1
 msgpack==0.6.2
 packaging==20.3
 pep517==0.8.2
+phonenumbers==8.12.17
 progress==1.5
 pyparsing==2.4.6
 python-dateutil==2.8.1
