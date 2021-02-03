@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import ValidationError, DataRequired
+from wtforms import StringField, SubmitField, FileField
+from wtforms.validators import ValidationError, DataRequired, regexp
 from app.models import Participant
 import phonenumbers
 
@@ -18,6 +18,7 @@ class RegistrationForm(FlaskForm):
     first_name = StringField('First name', validators=[DataRequired()])
     last_name = StringField('Last name', validators=[DataRequired()])
     phone = StringField('Phone number')
+    image = FileField('Image File')
     submit = SubmitField('Register')
     
     def validate_phone(self, phone):
