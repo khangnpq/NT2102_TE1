@@ -1,6 +1,6 @@
 from app import app
 import os
-from flask import render_template, flash, redirect, request, url_for, abort
+from flask import render_template, flash, redirect, request, url_for, abort, send_from_directory
 from app.forms import SearchForm, RegistrationForm, CheckPrizeForm
 from app.models import Participant
 from werkzeug.utils import secure_filename
@@ -59,7 +59,7 @@ def search():
             return redirect(url_for('search'))
     return render_template('search.html', form=form)
 
-# @app.route('/uploads/<filename>')
-# def display_image(filename):
-# 	#print('display_image filename: ' + filename)
-# 	return redirect(url_for('static', filename=filename), code=301)
+@app.route('/display/<filename>')
+def display_image(filename):
+	# print(app.root_path)
+	return redirect(url_for('../static', filename=filename),code=301)

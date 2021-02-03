@@ -23,4 +23,4 @@ class Participant(db.Model):
 
     def set_image_name(self, phone):
         name = hashlib.md5(str.encode(str(phone))).hexdigest()
-        return name + '.jpg'
+        return name + '.jpeg'
