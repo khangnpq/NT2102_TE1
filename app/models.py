@@ -1,4 +1,5 @@
 from app import db
+import hashlib
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class Participant(db.Model):
@@ -6,7 +7,7 @@ class Participant(db.Model):
     first_name = db.Column(db.String(36))
     last_name = db.Column(db.String(84))
     phone = db.Column(db.String(20))
-    # image_name = db.Column(db.String(36))
+    image_name = db.Column(db.String(36), default='default.jpg')
     lottery_code = db.Column(db.String(128))
 
     def __repr__(self):
@@ -19,3 +20,7 @@ class Participant(db.Model):
     
     def check_lottery_code(self, lottery_code):
         return check_password_hash(self.lottery_code, lottery_code)
+
+    def set_image_name(self, phone):
+        name = hashlib.md5(str.encode(str(phone))).hexdigest()
+        return name + '.jpg'

@@ -29,14 +29,16 @@ def register():
     if form.validate_on_submit():
         # handle saving image 
         image = form.image.data
-        filename = secure_filename(image.filename)
+        # filename = secure_filename(image.filename)
+        filename = Participant.set_image_name(Participant, form.phone.data) # md5 hash name for image
+        print(filename)
         if filename != '':
             image.save(os.path.join(app.config['UPLOAD_PATH'], filename))
 
         participant = Participant(first_name=form.first_name.data, 
                                   last_name=form.last_name.data,
-                                  phone=form.phone.data)
-                                #   image_name = filename)
+                                  phone=form.phone.data,
+                                  image_name = filename)
         code = participant.set_lottery_code(form.phone.data)
         db.session.add(participant)
         db.session.commit()
@@ -50,8 +52,14 @@ def search():
     if request.method == 'POST' and form.validate_on_submit():
         participant = Participant.query.filter_by(phone=form.phone.data).first()
         if participant is not None: #or not user.check_password(form.password.data):
+
             return render_template('index.html', results=participant)  # or what you want
         else:
             flash('Phone number is not recognized!')
             return redirect(url_for('search'))
     return render_template('search.html', form=form)
+
+@app.route('/uploads/<filename>')
+def display_image(filename):
+	#print('display_image filename: ' + filename)
+	return redirect(url_for('static', filename=filename), code=301)

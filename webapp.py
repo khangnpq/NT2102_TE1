@@ -1,9 +1,9 @@
 from app import app, db
 
 app.config['SECRET_KEY']
-app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
-app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif', '.jpeg']
-app.config['UPLOAD_PATH'] = './uploads'
+app.config['MAX_CONTENT_LENGTH']
+app.config['UPLOAD_EXTENSIONS']
+app.config['UPLOAD_PATH']
 
 # @app.shell_context_processor
 # def make_shell_context():

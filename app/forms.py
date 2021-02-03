@@ -29,3 +29,6 @@ class RegistrationForm(FlaskForm):
                 raise ValueError()
         except (phonenumbers.phonenumberutil.NumberParseException, ValueError):
             raise ValidationError('Invalid phone number')
+    
+    def validate_image(self, image):
+        pass
