@@ -6,6 +6,7 @@ class Participant(db.Model):
     first_name = db.Column(db.String(36))
     last_name = db.Column(db.String(84))
     phone = db.Column(db.String(20))
+    # image_name = db.Column(db.String(36))
     lottery_code = db.Column(db.String(128))
 
     def __repr__(self):

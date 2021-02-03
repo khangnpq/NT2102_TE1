@@ -1,7 +1,9 @@
 from app import app
-from flask import render_template, flash, redirect, request, url_for
+import os
+from flask import render_template, flash, redirect, request, url_for, abort
 from app.forms import SearchForm, RegistrationForm, CheckPrizeForm
 from app.models import Participant
+from werkzeug.utils import secure_filename
 from app import db
 
 @app.route('/')
@@ -25,9 +27,16 @@ def check_prize():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        # handle saving image 
+        image = form.image.data
+        filename = secure_filename(image.filename)
+        if filename != '':
+            image.save(os.path.join(app.config['UPLOAD_PATH'], filename))
+
         participant = Participant(first_name=form.first_name.data, 
                                   last_name=form.last_name.data,
                                   phone=form.phone.data)
+                                #   image_name = filename)
         code = participant.set_lottery_code(form.phone.data)
         db.session.add(participant)
         db.session.commit()
