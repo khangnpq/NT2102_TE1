@@ -5,7 +5,10 @@
     <div><p>First name: {{ results.first_name }}</p></div>
     <div><p>Last name: {{ results.last_name }}</p></div>
     <div><p>Phone number: {{ results.phone }}</p></div>
-    <div><p>Image: <img src="{{ './uploads/' + results.image_name }}"></p></div>
+    <div>  
+        Image: 
+        <img src="{{ url_for('display_image', filename=results.image_name) }}" style="width: 64px"/>
+    </div>
     {% elif prize %}
     <div><h2>{{ prize }}</h2></div>
     {% else %}
